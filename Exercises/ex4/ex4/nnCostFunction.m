@@ -26,7 +26,7 @@ Theta2 = reshape(nn_params((1 + (hidden_layer_size * (input_layer_size + 1))):en
 m = size(X, 1);
          
 % You need to return the following variables correctly 
-J = 0;
+%J = 0;
 Theta1_grad = zeros(size(Theta1));
 Theta2_grad = zeros(size(Theta2));
 
@@ -62,23 +62,30 @@ Theta2_grad = zeros(size(Theta2));
 %               and Theta2_grad from Part 2.
 %
 
+X = [ones(m, 1) X];
+z2 = Theta1 * X';
+a2 = sigmoid(z2);
+a2 = [ones(1, m); a2];
+z3 = Theta2 * a2;
+a3 = sigmoid(z3);
+[val id] = max(a3);
+Y = a3;
+Y(:,:) = 0;
+Y(sub2ind([num_labels, m], y', 1:m)) = 1;
 
+J = 0;
+for k = 1:num_labels
+	J = J + 1 / m .* (-Y(k, :) * (log(a3(k, :)))' - (1 - Y(k, :)) * (log(1 - a3(k, :)))');
+endfor
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+sq_sum_t1 = 0;
+sq_sum_t2 = 0;
+for j = 1:hidden_layer_size
+	sq_sum_t1 = sq_sum_t1 + Theta1(j, [2:end]) * Theta1(j, [2:end])'; 
+	sq_sum_t2 = sq_sum_t2 + Theta2(:, j + 1)' * Theta2(:, j + 1); 
+endfor
+reg_cost = lambda / (2 * m) * (sq_sum_t1 + sq_sum_t2);
+J = J + reg_cost;
 
 % -------------------------------------------------------------
 
